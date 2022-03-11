@@ -1,5 +1,5 @@
 
-import { useState, Fragment, ChangeEvent, startTransition } from "react";
+import { useState, Fragment, ChangeEvent, useTransition } from "react";
 
 
 // メンバーとタスクの型を定義する
@@ -79,7 +79,9 @@ function TaskCard(task: Task) {
   );
 }
 
-function TaskCardList({ taskList }: { taskList: Task[] }) {
+function TaskCardList({ taskList, isPending, }: { taskList: Task[], isPending: boolean }) {   // isPending を受け取るようにした
+  if (isPending) return <div>Loading...</div>; // ペンディング中はその旨を表示する
+  
   return taskList.length > 0 ? (
     <ul style={{ listStyleType: "none" }}>
       {taskList.map((task) => {
@@ -97,6 +99,8 @@ function App() {
   const [selectedMember, setSelectedMember] = useState<Member>();
   const [headline, setHeadline] = useState<string>("");
   const [taskList, setTaskList] = useState<Task[]>([]);
+  // isPendingは、トランジションがレンダリングされている間はtrueになり、レンダリングが終わるとfalseになる。
+  const [isPending, startTransition] = useTransition();
 
   const members: Member[] = ["Alice", "Bob", "Carol"];
 
@@ -131,7 +135,7 @@ function App() {
         );
       })}
       <h1>{headline}</h1>
-      <TaskCardList taskList={taskList} />
+      <TaskCardList taskList={taskList} isPending={isPending} />
     </>
   );
 }
